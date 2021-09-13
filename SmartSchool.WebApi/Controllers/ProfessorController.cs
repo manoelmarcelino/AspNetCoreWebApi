@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartSchool.WebApi.Data;
+using SmartSchool.WebApi.Data.UnitOfWork;
 using SmartSchool.WebApi.Models;
 
 namespace SmartSchool.WebApi.Controllers
@@ -10,23 +11,24 @@ namespace SmartSchool.WebApi.Controllers
     [Route("api/[controller]")]
     public class ProfessorController : ControllerBase
     {
-        private readonly SmartContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProfessorController(SmartContext context)
+        public ProfessorController(IUnitOfWork  unitOfWork)
         {
-            _context = context;
+           _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public IActionResult Get()
         {   
-            return Ok(_context.Professores);
+            return Ok(_unitOfWork.Professores.GetAll());
         }
 
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            var _professor  = _context.Professores.FirstOrDefault(a => a.Id == id);
+            var _professor  = _unitOfWork.Professores.Find(a => a.Id == id).FirstOrDefault();
+
             if(_professor == null) return NotFound("Aluno não encontrado");
             return Ok(_professor);
         }
@@ -34,9 +36,9 @@ namespace SmartSchool.WebApi.Controllers
         [HttpGet("ByName")]
         public IActionResult GetByName(string nome, string sobrenome)
         {
-            var _professor  = _context.Professores.FirstOrDefault(a => 
+            var _professor  = _unitOfWork.Professores.Find(a => 
                  a.Nome.Contains(nome) || a.Sobrenome.Contains(sobrenome) 
-            );
+            ).FirstOrDefault();
 
             if(_professor == null) return NotFound("Aluno não encontrado");
 
@@ -44,26 +46,26 @@ namespace SmartSchool.WebApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Professor aluno)
+        public IActionResult Create(Professor professor)
         {   
-            _context.Add(aluno);
-            _context.SaveChanges();
+            _unitOfWork.Professores.Add(professor);
+            _unitOfWork.Complete();
             
-            return Ok(aluno);
+            return Ok(professor);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, Professor professor)
         {   
-            var _professor = _context.Professores.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var _professor = _unitOfWork.Professores.Find(a => a.Id == id).FirstOrDefault();
             if(_professor == null) return NotFound("Aluno não encontrado");
 
             _professor.Nome = professor.Nome;
             _professor.Sobrenome = professor.Sobrenome;
             _professor.Telefone = professor.Telefone;
 
-            _context.Update(_professor);
-            _context.SaveChanges();
+            _unitOfWork.Professores.Add(professor);
+            _unitOfWork.Complete();
 
             return Ok("Aluno alterado com sucesso");
         }
@@ -71,29 +73,14 @@ namespace SmartSchool.WebApi.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {       
-            Professor _professor = _context.Professores.FirstOrDefault(a => a.Id == id);
+            Professor _professor = _unitOfWork.Professores.Find(a => a.Id == id).FirstOrDefault();
             if(_professor == null) return NotFound("Aluno não encontrado");
 
-             _context.Remove(_professor);
-            _context.SaveChanges();
+            _unitOfWork.Professores.Add(_professor);
+            _unitOfWork.Complete();
 
             return Ok();
         }
 
-        [HttpPatch("{id:int}")]
-        public IActionResult Patch(int id, Professor professor)
-        {   
-            Professor _professor = _context.Professores.FirstOrDefault(a => a.Id == id);
-            if(_professor == null) return NotFound("Professor não encontrado");
-
-            _professor.Nome = professor.Nome;
-            _professor.Sobrenome = professor.Sobrenome;
-            _professor.Telefone = professor.Telefone;
-
-             _context.Update(_professor);
-            _context.SaveChanges();
-
-            return Ok("Professor alterado com sucesso");
-        }
     }
 }
