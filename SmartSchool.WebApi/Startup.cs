@@ -29,7 +29,9 @@ namespace SmartSchool.WebApi
 
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IUnitOfWork, IUnitOfWork>();
-            services.AddControllers();
+            
+            
+            services.AddControllers().AddNewtonsoftJson();
             
             services.AddSwaggerGen(c =>
             {

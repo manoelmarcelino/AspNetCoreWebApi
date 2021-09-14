@@ -14,7 +14,7 @@ namespace SmartSchool.WebApi.Controllers
     {       
          private readonly IUnitOfWork _unitOfWork;
 
-        public AlunoController(IUnitOfWork  unitOfWork)
+        public AlunoController(IUnitOfWork unitOfWork)
         {
            _unitOfWork = unitOfWork;
         }
@@ -36,7 +36,7 @@ namespace SmartSchool.WebApi.Controllers
         [HttpGet("ByName")]
         public IActionResult GetByName(string nome, string sobrenome)
         {
-            var aluno  = _unitOfWork.Alunos.Find(a => 
+            var aluno  = _unitOfWork.Alunos.Find(a =>  
                  a.Nome.Contains(nome) || a.Sobrenome.Contains(sobrenome) 
             ).FirstOrDefault();
 
