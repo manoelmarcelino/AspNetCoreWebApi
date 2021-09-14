@@ -6,18 +6,16 @@ using SmartSchool.WebApi.Data;
 using SmartSchool.WebApi.Data.UnitOfWork;
 using SmartSchool.WebApi.Models;
 
-namespace SmartSchool.WebApi.Controllers
+namespace SmartSchool.WebApi.V1.Controllers
 {   
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class AlunoController : ControllerBase
     {       
          private readonly IUnitOfWork _unitOfWork;
 
-        public AlunoController(IUnitOfWork unitOfWork)
-        {
-           _unitOfWork = unitOfWork;
-        }
+        public AlunoController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         [HttpGet]
         public IActionResult Get()

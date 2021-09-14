@@ -4,7 +4,6 @@ namespace SmartSchool.WebApi.Data.UnitOfWork
     {
         private readonly SmartContext _context;
 
-     
         public UnitOfWork(SmartContext context)
         {
             _context = context;
