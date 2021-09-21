@@ -26,9 +26,22 @@ namespace SmartSchool.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddDbContext<SmartContext>(
-                context => context.UseSqlite(Configuration.GetConnectionString("Default"))
-            );
+        var connectionString = Configuration.GetConnectionString("MySqlConnection");
+
+        // Replace with your server version and type.
+        // Use 'MariaDbServerVersion' for MariaDB.
+        // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
+        // For common usages, see pull request #1233.
+        var serverVersion = ServerVersion.AutoDetect(connectionString);
+
+        // Replace 'YourDbContext' with the name of your own DbContext derived class.
+            // <-- with debugging (remove for production).
+
+        services.AddDbContext<SmartContext>(
+        dbContextOptions => dbContextOptions
+                .UseMySql(connectionString, serverVersion)
+                .EnableSensitiveDataLogging() // <-- These two calls are optional but help
+                .EnableDetailedErrors());
 
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IAlunoRepository, AlunoRepository>();
